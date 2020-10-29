@@ -11,59 +11,46 @@
     </head>
 
     <body>
-        <div class="ui grid">
+        <div class="ui grid padded ">
             <div class="sixteen wide column">
-                <div class="ui cards">
+                <div class="ui segment centered padded">
                     <div class="card">
                       <div class="content">
-                        <img class="right floated mini ui image" src="/images/avatar/large/elliot.jpg">
-                        <div class="header">
-                          Elliot Fu
+                        <h2 class="ui center aligned icon header">
+                            <i class="circular audio description icon"></i>
+                            Transcript
+                        </h2>
+                        <div class="meta ui huge header centered red">
+                            {{new_file_name}}
                         </div>
-                        <div class="meta">
-                          Friends of Veronika
+                        <div class="description ui large header centered">
+                            {{transcript}}
                         </div>
-                        <div class="description">
-                          Elliot requested permission to view your contact details
-                        </div>
-                      </div>
-                      <div class="extra content">
-                        <div class="ui two buttons">
-                          <div class="ui basic green button">Approve</div>
-                          <div class="ui basic red button">Decline</div>
+                        <div class="description ui small header centered">
+                            {{phoneme}}
                         </div>
                       </div>
-                    </div>
-                </div>
-            </div>
-            <div class="eight wide column">
-                <form action="{% url 'record' %}" method="POST">
-                    {% csrf_token %}
-                    <button id="submit" type="submit" value="Record" class="ui green labeled icon button">
-                        <i class="play circle icon"></i>
-                        Record
-                    </button>
-                </form>
-            </div>
-            <div class="eight wide column">
-                <form action="{% url 'stopRecord' %}" method="POST">
-                    {% csrf_token %}
-                    <button id="submit" type="submit" value="Stop Record" class="ui red labeled icon button">
-                        <i class="stop circle outline icon"></i>
-                        Stop Record
-                    </button>
-                </form>
-            </div>
-            <div class="eight wide column ui input">
-                <input value={{new_file_name}} />
-                <div class="ui statistics">
-                    <div class="statistic">
-                        <div class="value">
-                            <i class="file audio icon"></i> {{files_length}}
+                      <div class="content center">
+                        <div style="display: flex; justify-content: space-around; margin-top: 30px;">
+                            <form action="{% url 'record' %}" method="POST">
+                                {% csrf_token %}
+                                <div class="ui left action input">
+                                    <button class="ui green labeled icon button" id="submit" type="submit">
+                                      <i class="play circle icon"></i>
+                                      Record
+                                    </button>
+                                    <input type="text" value={{new_file_name}} >
+                                </div>
+                            </form>
+                            <form action="{% url 'stopRecord' %}" method="POST">
+                                {% csrf_token %}
+                                <button id="submit" type="submit" value="Stop Record" class="ui red labeled icon button">
+                                    <i class="stop circle outline icon"></i>
+                                    Stop Record
+                                </button>
+                            </form>
                         </div>
-                        <!-- <div class="label">
-                            {{new_file_name}}.csv
-                        </div> -->
+                      </div>
                     </div>
                 </div>
             </div>
@@ -72,7 +59,12 @@
                     <table class="ui very basic collapsing celled table">
                         <thead>
                             <tr>
-                              <th>File name</th>
+                                <h2 class="ui header">
+                                    <i class="folder outline icon"></i>
+                                    <div class="content">
+                                        File names
+                                    </div>
+                                </h2>
                             </tr>
                         </thead>
                         <tbody>

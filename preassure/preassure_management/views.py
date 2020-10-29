@@ -9,6 +9,8 @@ def index(request):
     list_of_files = glob.glob('data/pressure/*.csv')
     file_name = script.getFileName()
     context = {
+        "transcript": script.tran[file_name],
+        "phoneme": script.tran_phone[file_name],
         "new_file_name": file_name,
         "list_of_files": [file.split("\\")[1] for file in list_of_files][::-1][:10],
         "files_length": len(list_of_files)
@@ -17,10 +19,8 @@ def index(request):
 
 class Record(View):
     def post(self, request):
-        list_of_files = glob.glob('data/pressure/*.csv')
-        latest_file = max(list_of_files, key=os.path.getctime)
-        latest_file_name = str(int(latest_file.split("\\")[1].split(".")[0])+1)
-        command = 'pythonw C:/Users/Sun/Desktop/works/pressure-ui/arduino/pressure.py ' + latest_file_name
+        file_name = script.getFileName()
+        command = 'pythonw C:/Users/Sun/Desktop/works/pressure-ui/arduino/pressure.py ' + file_name
         subprocess.Popen(command)
         return redirect('/')
 
