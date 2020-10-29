@@ -1,0 +1,99 @@
+<html>
+    <head>
+        {% load static %}
+        <link rel="stylesheet" type="text/css" href="{% static 'style.css' %}"/>
+        <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.css">
+        <script
+            src="https://code.jquery.com/jquery-3.1.1.min.js"
+            integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="
+            crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.jss"></script>
+    </head>
+
+    <body>
+        <div class="ui grid">
+            <div class="sixteen wide column">
+                <div class="ui cards">
+                    <div class="card">
+                      <div class="content">
+                        <img class="right floated mini ui image" src="/images/avatar/large/elliot.jpg">
+                        <div class="header">
+                          Elliot Fu
+                        </div>
+                        <div class="meta">
+                          Friends of Veronika
+                        </div>
+                        <div class="description">
+                          Elliot requested permission to view your contact details
+                        </div>
+                      </div>
+                      <div class="extra content">
+                        <div class="ui two buttons">
+                          <div class="ui basic green button">Approve</div>
+                          <div class="ui basic red button">Decline</div>
+                        </div>
+                      </div>
+                    </div>
+                </div>
+            </div>
+            <div class="eight wide column">
+                <form action="{% url 'record' %}" method="POST">
+                    {% csrf_token %}
+                    <button id="submit" type="submit" value="Record" class="ui green labeled icon button">
+                        <i class="play circle icon"></i>
+                        Record
+                    </button>
+                </form>
+            </div>
+            <div class="eight wide column">
+                <form action="{% url 'stopRecord' %}" method="POST">
+                    {% csrf_token %}
+                    <button id="submit" type="submit" value="Stop Record" class="ui red labeled icon button">
+                        <i class="stop circle outline icon"></i>
+                        Stop Record
+                    </button>
+                </form>
+            </div>
+            <div class="eight wide column ui input">
+                <input value={{new_file_name}} />
+                <div class="ui statistics">
+                    <div class="statistic">
+                        <div class="value">
+                            <i class="file audio icon"></i> {{files_length}}
+                        </div>
+                        <!-- <div class="label">
+                            {{new_file_name}}.csv
+                        </div> -->
+                    </div>
+                </div>
+            </div>
+            <div class="eight wide column">
+                <div class="ui list">
+                    <table class="ui very basic collapsing celled table">
+                        <thead>
+                            <tr>
+                              <th>File name</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for file in list_of_files %}
+                                <tr>
+                                    <td>
+                                        <h4 class="ui image header">
+                                            <i class="file audio outline icon"></i>
+                                            <div class="content">
+                                                {{file}}
+                                            <!-- <div class="sub header">Human Resources
+                                            </div> -->
+                                        </div>
+                                        </h4>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>
