@@ -1,13 +1,17 @@
 <html>
     <head>
         {% load static %}
-        <link rel="stylesheet" type="text/css" href="{% static 'style.css' %}"/>
+        <link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}"/>
         <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.css">
+        <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.min.css">
         <script
             src="https://code.jquery.com/jquery-3.1.1.min.js"
             integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="
             crossorigin="anonymous"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.jss"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.bundle.min.js"></script>
     </head>
 
     <body>
@@ -54,7 +58,7 @@
                     </div>
                 </div>
             </div>
-            <div class="eight wide column">
+            <div class="four wide column">
                 <div class="ui list">
                     <table class="ui very basic collapsing celled table">
                         <thead>
@@ -75,9 +79,7 @@
                                             <i class="file audio outline icon"></i>
                                             <div class="content">
                                                 {{file}}
-                                            <!-- <div class="sub header">Human Resources
-                                            </div> -->
-                                        </div>
+                                            </div>
                                         </h4>
                                     </td>
                                 </tr>
@@ -86,6 +88,50 @@
                     </table>
                 </div>
             </div>
+            <div class="twelve wide column">
+                <div id="demo">
+                    {{start}}
+                    <canvas id="myChart" width="400" height="200"></canvas>
+                </div>
+            </div>
         </div>
+
+        <script>
+            function getChartData() {
+                $.ajax({
+                    url: "http://localhost:8000/sensorContent/{{new_file_name}}",
+                    success: function (result) {
+                        console.log(result)
+                        if(result) renderChart(result);
+                    }
+                });
+            }
+
+            function renderChart(data) {
+                var ctx = document.getElementById("myChart").getContext('2d');
+                var myChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+                        datasets: [
+                            {
+                                label: 'Left',
+                                data: data[0],
+                                borderColor: 'rgba(75, 192, 192, 1)',
+                                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                            },
+                            {
+                                label: 'Top',
+                                data: data[1],
+                                borderColor: 'rgba(192, 192, 192, 1)',
+                                backgroundColor: 'rgba(192, 192, 192, 0.2)',
+                            }
+                        ]
+                    },
+                });
+            }
+
+            if ("{{record}}" == "True") setInterval(getChartData, 500);
+        </script>
     </body>
 </html>
