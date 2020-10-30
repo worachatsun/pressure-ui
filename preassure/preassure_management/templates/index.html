@@ -24,42 +24,36 @@
                             <i class="circular audio description icon"></i>
                             Transcript
                         </h2>
-                        <div class="meta ui huge header centered red">
+                        <div class="meta ui huge header centered red" id="new_file_name">
                             {{new_file_name}}
                         </div>
-                        <div class="description ui large header centered">
+                        <div class="description ui large header centered" id="transcript">
                             {{transcript}}
                         </div>
-                        <div class="description ui small header centered">
+                        <div class="description ui small header centered" id="phoneme">
                             {{phoneme}}
                         </div>
                       </div>
                       <div class="content center">
                         <div style="display: flex; justify-content: space-around; margin-top: 30px;">
-                            <form action="{% url 'record' %}" method="POST">
-                                {% csrf_token %}
-                                <div class="ui left action input">
-                                    <button class="ui green labeled icon button" id="submit" type="submit">
-                                      <i class="play circle icon"></i>
-                                      Record
-                                    </button>
-                                    <input type="text" value={{new_file_name}} >
-                                </div>
-                            </form>
-                            <form action="{% url 'stopRecord' %}" method="POST">
-                                {% csrf_token %}
-                                <button id="submit" type="submit" value="Stop Record" class="ui red labeled icon button">
-                                    <i class="stop circle outline icon"></i>
-                                    Stop Record
+                            <div class="ui left action input">
+                                <button class="ui green labeled icon button" id="submit" onclick="record()">
+                                  <i class="play circle icon"></i>
+                                  Record
                                 </button>
-                            </form>
+                                <input type="text" value={{new_file_name}} >
+                            </div>
+                            <button class="ui red labeled icon button" id="submit" onclick="stopRecord()">
+                                <i class="play circle icon"></i>
+                                Stop Record
+                            </button>
                         </div>
                       </div>
                     </div>
                 </div>
             </div>
             <div class="four wide column">
-                <div class="ui list">
+                <div class="ui list segment padded">
                     <table class="ui very basic collapsing celled table">
                         <thead>
                             <tr>
@@ -89,12 +83,53 @@
                 </div>
             </div>
             <div class="twelve wide column">
+                 <div id="formats">Format: start recording to see sample rate</div>
                 <div id="demo">
                     {{start}}
                     <canvas id="myChart" width="400" height="200"></canvas>
                 </div>
             </div>
         </div>
+
+        {% csrf_token %}
+        <script>
+            var interval;
+
+            const record = () => {
+                const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+                const request = new Request(
+                    "{% url 'recordJSON' %}",
+                    {headers: {'X-CSRFToken': csrftoken}}
+                );
+                fetch(request, {
+                    method: 'POST',
+                    mode: 'same-origin'
+                })
+                interval = setInterval(getChartData, 500);
+                startRecording()
+            }
+
+            const stopRecord = () => {
+                const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+                const request = new Request(
+                    "{% url 'stopRecordJSON' %}",
+                    {headers: {'X-CSRFToken': csrftoken}}
+                );
+                fetch(request, {
+                    method: 'POST',
+                    mode: 'same-origin'
+                }).then(async (response) => {
+                    const data = await response.json()
+                    $('#new_file_name').html(data.new_file_name);
+                    $('#phoneme').html(data.phoneme);
+                    $('#transcript').html(data.transcript);
+                    console.log(data)
+                });
+                clearInterval(interval);
+                stopRecording()
+                location.reload();
+            }
+        </script>
 
         <script>
             function getChartData() {
@@ -107,9 +142,10 @@
                 });
             }
 
+            var myChart
             function renderChart(data) {
                 var ctx = document.getElementById("myChart").getContext('2d');
-                var myChart = new Chart(ctx, {
+                myChart = new Chart(ctx, {
                     type: 'line',
                     data: {
                         labels: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
@@ -130,8 +166,63 @@
                     },
                 });
             }
+        </script>
 
-            if ("{{record}}" == "True") setInterval(getChartData, 500);
+        <script src="https://cdn.rawgit.com/mattdiamond/Recorderjs/08e7abd9/dist/recorder.js"></script>
+        <script>
+            URL = window.URL || window.webkitURL;
+
+            var gumStream;
+            var rec;
+            var input;
+
+            var AudioContext = window.AudioContext || window.webkitAudioContext;
+            var AudioContext
+
+            function startRecording() {
+                console.log("recordButton clicked");
+                var constraints = { audio: true, video:false }
+                navigator.mediaDevices.getUserMedia(constraints).then(function(stream) {
+                    console.log("getUserMedia() success, stream created, initializing Recorder.js ...");
+                    audioContext = new AudioContext();
+                    document.getElementById("formats").innerHTML="Format: 1 channel pcm @ "+audioContext.sampleRate/1000+"kHz"
+                    gumStream = stream;
+                    input = audioContext.createMediaStreamSource(stream);
+                    rec = new Recorder(input,{numChannels:1})
+                    rec.record()
+                    console.log("Recording started");
+                }).catch(function(err) {
+                    console.log(err)
+                });
+            }
+
+            function pauseRecording(){
+                console.log("pauseButton clicked rec.recording=",rec.recording );
+                if (rec.recording){
+                    rec.stop();
+                    pauseButton.innerHTML="Resume";
+                }else{
+                    rec.record()
+                    pauseButton.innerHTML="Pause";
+
+                }
+            }
+
+            function stopRecording() {
+                console.log("stopButton clicked");
+                rec.stop();
+                gumStream.getAudioTracks()[0].stop();
+                rec.exportWAV(createDownloadLink);
+            }
+
+            function createDownloadLink(blob) {
+                var url = URL.createObjectURL(blob);
+                var link = document.createElement('a');
+                link.href = url;
+                link.download = "{{new_file_name}}.wav";
+                link.innerHTML = "Save to disk";
+                link.click();
+            }
         </script>
     </body>
 </html>

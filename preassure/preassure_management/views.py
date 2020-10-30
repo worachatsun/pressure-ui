@@ -12,7 +12,7 @@ def index(request):
         "transcript": script.tran[file_name],
         "phoneme": script.tran_phone[file_name],
         "new_file_name": file_name,
-        "list_of_files": [file.split("\\")[1] for file in list_of_files][::-1][:10],
+        "list_of_files": [file.split("\\")[1] for file in list_of_files][::-1][:5],
         "files_length": len(list_of_files)
     }
     return render(request, 'index.html', context)
@@ -28,11 +28,43 @@ class Record(View):
             "transcript": script.tran[file_name],
             "phoneme": script.tran_phone[file_name],
             "new_file_name": file_name,
-            "list_of_files": [file.split("\\")[1] for file in list_of_files][::-1][:10],
+            "list_of_files": [file.split("\\")[1] for file in list_of_files][::-1][:5],
             "files_length": len(list_of_files),
             "record": True
         }
         return render(request, 'index.html', context)
+
+class RecordJSON(View):
+    def post(self, request):
+        file_name = script.getFileName()
+        command = 'pythonw C:/Users/Sun/Desktop/works/pressure-ui/arduino/pressure.py ' + file_name
+        subprocess.Popen(command)
+        list_of_files = glob.glob('data/pressure/*.csv')
+        data = {
+            "transcript": script.tran[file_name],
+            "phoneme": script.tran_phone[file_name],
+            "new_file_name": file_name,
+            "list_of_files": [file.split("\\")[1] for file in list_of_files][::-1][:5],
+            "files_length": len(list_of_files),
+            "record": True
+        }
+        return JsonResponse(data, safe=False)
+
+class StopRecordJSON(View):
+    def post(self, request):
+        os.system("TASKKILL /F /IM pythonw.exe")
+        file_name = script.getFileName()
+        list_of_files = glob.glob('data/pressure/*.csv')
+        data = {
+            "transcript": script.tran[file_name],
+            "phoneme": script.tran_phone[file_name],
+            "new_file_name": file_name,
+            "list_of_files": [file.split("\\")[1] for file in list_of_files][::-1][:5],
+            "files_length": len(list_of_files),
+            "record": True
+        }
+        return JsonResponse(data, safe=False)
+        
 
 class StopRecord(View):
     def post(self, request):
