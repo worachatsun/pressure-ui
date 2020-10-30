@@ -49,6 +49,14 @@
                             </button>
                         </div>
                       </div>
+                      <div class="ui icon message">
+                        <i class="play circle outline icon" id="audio_format"></i>
+                        <div class="content">
+                          <div class="header" id="formats">
+                            Format: start recording to see sample rate
+                          </div>
+                        </div>
+                      </div>
                     </div>
                 </div>
             </div>
@@ -83,7 +91,6 @@
                 </div>
             </div>
             <div class="twelve wide column">
-                 <div id="formats">Format: start recording to see sample rate</div>
                 <div id="demo">
                     {{start}}
                     <canvas id="myChart" width="400" height="200"></canvas>
@@ -190,22 +197,12 @@
                     input = audioContext.createMediaStreamSource(stream);
                     rec = new Recorder(input,{numChannels:1})
                     rec.record()
+                    $("#audio_format").removeClass("play circle outline");
+                    $("#audio_format").addClass("notched circle loading");
                     console.log("Recording started");
                 }).catch(function(err) {
                     console.log(err)
                 });
-            }
-
-            function pauseRecording(){
-                console.log("pauseButton clicked rec.recording=",rec.recording );
-                if (rec.recording){
-                    rec.stop();
-                    pauseButton.innerHTML="Resume";
-                }else{
-                    rec.record()
-                    pauseButton.innerHTML="Pause";
-
-                }
             }
 
             function stopRecording() {
