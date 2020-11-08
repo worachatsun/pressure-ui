@@ -4,10 +4,12 @@ from django.http import HttpResponse, JsonResponse
 from time import sleep
 import os, signal, subprocess, serial, glob
 from preassure_management import script
+import pyrebase
 
 def index(request):
     list_of_files = glob.glob('data/pressure/*.csv')
     file_name = script.getFileName()
+    os.system("TASKKILL /F /IM pythonw.exe")
     context = {
         "transcript": script.tran[file_name],
         "phoneme": script.tran_phone[file_name],
@@ -23,7 +25,6 @@ class Record(View):
         command = 'pythonw C:/Users/Sun/Desktop/works/pressure-ui/arduino/pressure.py ' + file_name
         subprocess.Popen(command)
         list_of_files = glob.glob('data/pressure/*.csv')
-        file_name = script.getFileName()
         context = {
             "transcript": script.tran[file_name],
             "phoneme": script.tran_phone[file_name],
@@ -36,7 +37,10 @@ class Record(View):
 
 class RecordJSON(View):
     def post(self, request):
-        file_name = script.getFileName()
+        file_name = request.body.decode('utf-8')
+        # print(body_unicode)
+        # file_name = script.getFileName()
+        # print(file_name)
         command = 'pythonw C:/Users/Sun/Desktop/works/pressure-ui/arduino/pressure.py ' + file_name
         subprocess.Popen(command)
         list_of_files = glob.glob('data/pressure/*.csv')
@@ -50,9 +54,21 @@ class RecordJSON(View):
         }
         return JsonResponse(data, safe=False)
 
+class getTargetJSON(View):
+    def post(self, request):
+        file_name = request.body.decode('utf-8')
+        data = {
+            "transcript": script.tran[file_name],
+            "phoneme": script.tran_phone[file_name],
+            "new_file_name": file_name
+        }
+        return JsonResponse(data, safe=False)
+
 class StopRecordJSON(View):
     def post(self, request):
         os.system("TASKKILL /F /IM pythonw.exe")
+        file_name_cur = request.body.decode('utf-8')
+        self.firebaseUpload(file_name_cur)
         file_name = script.getFileName()
         list_of_files = glob.glob('data/pressure/*.csv')
         data = {
@@ -64,8 +80,19 @@ class StopRecordJSON(View):
             "record": True
         }
         return JsonResponse(data, safe=False)
-        
 
+    def firebaseUpload(self, file_name_cur):
+        config = {
+            "config": 'xxx'
+        }
+
+        firebase = pyrebase.initialize_app(config)
+        storage = firebase.storage()
+
+        path_on_cloud = "csv/"+file_name_cur+".csv"
+        path_local = "C:/Users/Sun/Desktop/works/pressure-ui/pressure-ui/preassure/data/pressure/"+file_name_cur+".csv"
+        storage.child(path_on_cloud).put(path_local)
+        
 class StopRecord(View):
     def post(self, request):
         os.system("TASKKILL /F /IM pythonw.exe")

@@ -1,256 +1,254 @@
 <html>
-  <head>
-    {% load static %}
-    <link
-      rel="stylesheet"
-      type="text/css"
-      href="{% static 'css/style.css' %}"
-    />
-    <link
-      rel="stylesheet"
-      type="text/css"
-      href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.css"
-    />
-    <link
-      rel="stylesheet"
-      type="text/css"
-      href="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.min.css"
-    />
-    <script
-      src="https://code.jquery.com/jquery-3.1.1.min.js"
-      integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="
-      crossorigin="anonymous"
-    ></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.jss"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.bundle.min.js"></script>
-  </head>
+    <head>
+        {% load static %}
+        <link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}"/>
+        <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.css">
+        <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.min.css">
+        <script
+            src="https://code.jquery.com/jquery-3.1.1.min.js"
+            integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="
+            crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.jss"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.bundle.min.js"></script>
+    </head>
 
-  <body>
-    <div class="ui grid padded">
-      <div class="sixteen wide column">
-        <div class="ui segment centered padded">
-          <div class="card">
-            <div class="content">
-              <h2 class="ui center aligned icon header">
-                <i class="circular audio description icon"></i>
-                Transcript
-              </h2>
-              <div class="meta ui huge header centered red" id="new_file_name">
-                {{new_file_name}}
-              </div>
-              <div class="description ui large header centered" id="transcript">
-                {{transcript}}
-              </div>
-              <div class="description ui small header centered" id="phoneme">
-                {{phoneme}}
-              </div>
-            </div>
-            <div class="content center">
-              <div
-                style="
-                  display: flex;
-                  justify-content: space-around;
-                  margin-top: 30px;
-                "
-              >
-                <div class="ui left action input">
-                  <button
-                    class="ui green labeled icon button"
-                    id="submit"
-                    onclick="record()"
-                  >
-                    <i class="play circle icon"></i>
-                    Record
-                  </button>
-                  <input type="text" value="{{new_file_name}}" />
+    <body>
+        <div class="ui grid padded ">
+            <div class="sixteen wide column">
+                <div class="ui segment centered padded">
+                    <div class="card">
+                      <div class="content">
+                        <h2 class="ui center aligned icon header">
+                            <i class="circular audio description icon"></i>
+                            Transcript
+                        </h2>
+                        <div class="meta ui huge header centered red" id="new_file_name">
+                            {{new_file_name}}
+                        </div>
+                        <div class="description ui large header centered" id="transcript">
+                            {{transcript}}
+                        </div>
+                        <div class="description ui small header centered" id="phoneme">
+                            {{phoneme}}
+                        </div>
+                      </div>
+                      <div class="content center">
+                        <div style="display: flex; justify-content: space-around; margin-top: 30px;">
+                            <div class="ui left action input">
+                                <button class="ui green labeled icon button" id="submit_record" onclick="record()">
+                                  <i class="play circle icon"></i>
+                                  Record
+                                </button>
+                                <input id="custom_file_name" type="text" value={{new_file_name}} >
+                                <button class="ui yellow icon button" id="submit_record" onClick="getTargetJson()">
+                                    <i class="sync alternate icon"></i>
+                                </button>
+                            </div>
+                            <button class="ui red labeled icon button" id="submit_stop_record" onclick="stopRecord()">
+                                <i class="play circle icon"></i>
+                                Stop Record
+                            </button>
+                        </div>
+                      </div>
+                      <div class="ui icon message">
+                        <i class="play circle outline icon" id="audio_format"></i>
+                        <div class="content">
+                          <div class="header" id="formats">
+                            Format: start recording to see sample rate
+                          </div>
+                        </div>
+                      </div>
+                    </div>
                 </div>
-                <button
-                  class="ui red labeled icon button"
-                  id="submit"
-                  onclick="stopRecord()"
-                >
-                  <i class="play circle icon"></i>
-                  Stop Record
-                </button>
-              </div>
             </div>
-            <div class="ui icon message">
-              <i class="play circle outline icon" id="audio_format"></i>
-              <div class="content">
-                <div class="header" id="formats">
-                  Format: start recording to see sample rate
+            <div class="four wide column">
+                <div class="ui list segment padded">
+                    <table class="ui very basic collapsing celled table">
+                        <thead>
+                            <tr>
+                                <h2 class="ui header">
+                                    <i class="folder outline icon"></i>
+                                    <div class="content">
+                                        File names
+                                    </div>
+                                </h2>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for file in list_of_files %}
+                                <tr>
+                                    <td>
+                                        <h4 class="ui image header">
+                                            <i class="file audio outline icon"></i>
+                                            <div class="content">
+                                                {{file}}
+                                            </div>
+                                        </h4>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
                 </div>
-              </div>
             </div>
-          </div>
+            <div class="twelve wide column">
+                <div id="demo">
+                    {{start}}
+                    <canvas id="myChart" width="400" height="200"></canvas>
+                </div>
+            </div>
         </div>
-      </div>
-      <div class="four wide column">
-        <div class="ui list segment padded">
-          <table class="ui very basic collapsing celled table">
-            <thead>
-              <tr>
-                <h2 class="ui header">
-                  <i class="folder outline icon"></i>
-                  <div class="content">File names</div>
-                </h2>
-              </tr>
-            </thead>
-            <tbody>
-              {% for file in list_of_files %}
-              <tr>
-                <td>
-                  <h4 class="ui image header">
-                    <i class="file audio outline icon"></i>
-                    <div class="content">{{file}}</div>
-                  </h4>
-                </td>
-              </tr>
-              {% endfor %}
-            </tbody>
-          </table>
-        </div>
-      </div>
-      <div class="twelve wide column">
-        <div id="demo">
-          {{start}}
-          <canvas id="myChart" width="400" height="200"></canvas>
-        </div>
-      </div>
-    </div>
 
-    {% csrf_token %}
-    <script>
-      var interval;
+        {% csrf_token %}
+        <script>
+            var interval;
 
-      const record = () => {
-        const csrftoken = document.querySelector("[name=csrfmiddlewaretoken]")
-          .value;
-        const request = new Request("{% url 'recordJSON' %}", {
-          headers: { "X-CSRFToken": csrftoken },
-        });
-        fetch(request, {
-          method: "POST",
-          mode: "same-origin",
-        });
-        interval = setInterval(getChartData, 500);
-        startRecording();
-      };
+            const record = () => {
+                const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+                const filename = $("#custom_file_name").val()
+                const request = new Request(
+                    "{% url 'recordJSON' %}",
+                    {headers: {'X-CSRFToken': csrftoken}}
+                );
+                fetch(request, {
+                    method: 'POST',
+                    mode: 'same-origin',
+                    body: filename
+                })
+                interval = setInterval(getChartData, 500);
+                startRecording()
+                $("#submit_record").addClass("disabled");
+            }
 
-      const stopRecord = () => {
-        const csrftoken = document.querySelector("[name=csrfmiddlewaretoken]")
-          .value;
-        const request = new Request("{% url 'stopRecordJSON' %}", {
-          headers: { "X-CSRFToken": csrftoken },
-        });
-        fetch(request, {
-          method: "POST",
-          mode: "same-origin",
-        }).then(async (response) => {
-          const data = await response.json();
-          $("#new_file_name").html(data.new_file_name);
-          $("#phoneme").html(data.phoneme);
-          $("#transcript").html(data.transcript);
-          console.log(data);
-        });
-        clearInterval(interval);
-        stopRecording();
-        setInterval(() => location.reload(), 500);
-      };
-    </script>
+            const stopRecord = () => {
+                const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+                const filename = $("#custom_file_name").val()
+                const request = new Request(
+                    "{% url 'stopRecordJSON' %}",
+                    {headers: {'X-CSRFToken': csrftoken}}
+                );
+                fetch(request, {
+                    method: 'POST',
+                    mode: 'same-origin',
+                    body: filename
+                }).then(async (response) => {
+                    const data = await response.json()
+                    $('#new_file_name').html(data.new_file_name);
+                    $('#phoneme').html(data.phoneme);
+                    $('#transcript').html(data.transcript);
+                    console.log(data)
+                });
+                clearInterval(interval);
+                stopRecording()
+                location.reload();
+            }
 
-    <script>
-      function getChartData() {
-        $.ajax({
-          url: "http://localhost:8000/sensorContent/{{new_file_name}}",
-          success: function (result) {
-            console.log(result);
-            if (result) renderChart(result);
-          },
-        });
-      }
+            const getTargetJson = () => {
+                const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+                const filename = $("#custom_file_name").val()
+                const request = new Request(
+                    "{% url 'getTargetJSON' %}",
+                    {headers: {'X-CSRFToken': csrftoken}}
+                );
+                fetch(request, {
+                    method: 'POST',
+                    mode: 'same-origin',
+                    body: filename
+                }).then(async (response) => {
+                    const data = await response.json()
+                    $('#new_file_name').html(data.new_file_name);
+                    $('#phoneme').html(data.phoneme);
+                    $('#transcript').html(data.transcript);
+                    console.log(data)
+                });
+            }
+        </script>
 
-      var myChart;
-      function renderChart(data) {
-        var ctx = document.getElementById("myChart").getContext("2d");
-        myChart = new Chart(ctx, {
-          type: "line",
-          data: {
-            labels: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
-            datasets: [
-              {
-                label: "Left",
-                data: data[0],
-                borderColor: "rgba(75, 192, 192, 1)",
-                backgroundColor: "rgba(75, 192, 192, 0.2)",
-              },
-              {
-                label: "Top",
-                data: data[1],
-                borderColor: "rgba(192, 192, 192, 1)",
-                backgroundColor: "rgba(192, 192, 192, 0.2)",
-              },
-            ],
-          },
-        });
-      }
-    </script>
+        <script>
+            function getChartData() {
+                $.ajax({
+                    url: "http://localhost:8000/sensorContent/{{new_file_name}}",
+                    success: function (result) {
+                        console.log(result)
+                        if(result) renderChart(result);
+                    }
+                });
+            }
 
-    <script src="https://cdn.rawgit.com/mattdiamond/Recorderjs/08e7abd9/dist/recorder.js"></script>
-    <script>
-      URL = window.URL || window.webkitURL;
+            var myChart
+            function renderChart(data) {
+                var ctx = document.getElementById("myChart").getContext('2d');
+                myChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+                        datasets: [
+                            {
+                                label: 'Left',
+                                data: data[0],
+                                borderColor: 'rgba(75, 192, 192, 1)',
+                                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                            },
+                            {
+                                label: 'Top',
+                                data: data[1],
+                                borderColor: 'rgba(192, 192, 192, 1)',
+                                backgroundColor: 'rgba(192, 192, 192, 0.2)',
+                            }
+                        ]
+                    },
+                });
+            }
+        </script>
 
-      var gumStream;
-      var rec;
-      var input;
+        <script src="https://cdn.rawgit.com/mattdiamond/Recorderjs/08e7abd9/dist/recorder.js"></script>
+        <script>
+            URL = window.URL || window.webkitURL;
 
-      var AudioContext = window.AudioContext || window.webkitAudioContext;
-      var AudioContext;
+            var gumStream;
+            var rec;
+            var input;
 
-      function startRecording() {
-        console.log("recordButton clicked");
-        var constraints = { audio: true, video: false };
-        navigator.mediaDevices
-          .getUserMedia(constraints)
-          .then(function (stream) {
-            console.log(
-              "getUserMedia() success, stream created, initializing Recorder.js ..."
-            );
-            audioContext = new AudioContext();
-            document.getElementById("formats").innerHTML =
-              "Format: 1 channel pcm @ " +
-              audioContext.sampleRate / 1000 +
-              "kHz";
-            gumStream = stream;
-            input = audioContext.createMediaStreamSource(stream);
-            rec = new Recorder(input, { numChannels: 1 });
-            rec.record();
-            $("#audio_format").removeClass("play circle outline");
-            $("#audio_format").addClass("notched circle loading");
-            console.log("Recording started");
-          })
-          .catch(function (err) {
-            console.log(err);
-          });
-      }
+            var AudioContext = window.AudioContext || window.webkitAudioContext;
+            var AudioContext
 
-      function stopRecording() {
-        console.log("stopButton clicked");
-        rec.stop();
-        gumStream.getAudioTracks()[0].stop();
-        rec.exportWAV(createDownloadLink);
-      }
+            function startRecording() {
+                console.log("recordButton clicked");
+                var constraints = { audio: true, video:false }
+                navigator.mediaDevices.getUserMedia(constraints).then(function(stream) {
+                    console.log("getUserMedia() success, stream created, initializing Recorder.js ...");
+                    audioContext = new AudioContext();
+                    document.getElementById("formats").innerHTML="Format: 1 channel pcm @ "+audioContext.sampleRate/1000+"kHz"
+                    gumStream = stream;
+                    input = audioContext.createMediaStreamSource(stream);
+                    rec = new Recorder(input,{numChannels:1})
+                    rec.record()
+                    $("#audio_format").removeClass("play circle outline");
+                    $("#audio_format").addClass("notched circle loading");
+                    console.log("Recording started");
+                }).catch(function(err) {
+                    console.log(err)
+                });
+            }
 
-      function createDownloadLink(blob) {
-        var url = URL.createObjectURL(blob);
-        var link = document.createElement("a");
-        link.href = url;
-        link.download = "{{new_file_name}}.wav";
-        link.innerHTML = "Save to disk";
-        link.click();
-      }
-    </script>
-  </body>
+            function stopRecording() {
+                console.log("stopButton clicked");
+                rec.stop();
+                gumStream.getAudioTracks()[0].stop();
+                rec.exportWAV(createDownloadLink);
+            }
+
+            function createDownloadLink(blob) {
+                var url = URL.createObjectURL(blob);
+                var link = document.createElement('a');
+                const filename = $("#custom_file_name").val()
+                link.href = url;
+                link.download = filename + ".wav";
+                link.innerHTML = "Save to disk";
+                link.click();
+            }
+        </script>
+    </body>
 </html>

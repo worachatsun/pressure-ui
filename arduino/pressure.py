@@ -2,6 +2,7 @@ import os
 import sys
 import serial
 from time import sleep
+from datetime import datetime
 
 class Arduino:
     def __init__(self, port):
@@ -18,7 +19,8 @@ filename = "data/pressure/" + sys.argv[1] +".csv"
 os.makedirs(os.path.dirname(filename), exist_ok=True)
 
 while True:
+    now = datetime.now()
     f = open(filename, "a")
-    f.write(ard.query('0')+"\n")
+    f.write(now+ard.query('0')+"\n")
     f.close()
 
